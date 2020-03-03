@@ -18,21 +18,17 @@ repositories {
         url "https://modmaven.k-4u.nl"
     }
 }
-
+Properties props = new Properties()
+props.load(new BufferedReader(new FileReader(file('../forgegradle.properties'))))
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-project.ext {
-    buildNum = System.getenv("BUILD_NUMBER")
-    mcVersion="1.12.1"
-}
-
 dependencies {
-    deobfCompile "k4unl:k4lib:${project.ext.mcVersion}-2.1.79:universal"
+    compile project(":CoffeeForged")
 }
 
 
-version = project.ext.mcVersion + "-2.0." + project.ext.buildNum
+version = "${props.get('minecraft_version')}-COFFEE-2.0.0"
 group= "k4unl.minecraft.siv" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ServerInfoViewer"
 
@@ -45,14 +41,14 @@ allprojects {
 }
 
 minecraft {
-    version = "${project.ext.mcVersion}-14.22.0.2452"
+    version = "${props.get('minecraft_version')}-${props.get('forge_version')}"
     replace "@VERSION@", project.version
-    replace "@BUILDNUM@", project.ext.buildNum
 
-    mappings = "snapshot_20170810"
+    mappings = "${props.get('forge_mappings')}"
 
-    runDir = "../Minecraft/"
+    runDir = "run"
 }
+
 
 // configure the source folders
 sourceSets {
@@ -78,7 +74,7 @@ processResources
     inputs.property "mcversion", project.minecraft.version
 
     // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
+ 	from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
                 
         // replace version and mcversion
